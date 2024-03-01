@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 543438590470033000}
   - component: {fileID: 2477941257939332698}
   - component: {fileID: -3508493503789781695}
+  - component: {fileID: -2847152253708575487}
   m_Layer: 0
   m_Name: Stone
   m_TagString: stone
@@ -28,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 8326905656423286602}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.364585, y: -0.30004287, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -158,3 +159,15 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.64, y: 0.64}
   m_EdgeRadius: 0
+--- !u!114 &-2847152253708575487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8326905656423286602}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c74b038faf798f34d9db94d460f07b6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

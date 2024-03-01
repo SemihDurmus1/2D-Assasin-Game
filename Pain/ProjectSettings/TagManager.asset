@@ -15,8 +15,8 @@ TagManager:
   - Water
   - UI
   - enemy
-  - 
-  - 
+  - Player
+  - Obstruction
   - 
   - 
   - 
@@ -44,6 +44,18 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Background
+    uniqueID: 3727035259
+    locked: 0
+  - name: AraObjeler
+    uniqueID: 603403909
+    locked: 0
+  - name: Zemin
+    uniqueID: 800914275
+    locked: 0
   - name: Player
     uniqueID: 2359315375
+    locked: 0
+  - name: Enemy
+    uniqueID: 3631537375
     locked: 0

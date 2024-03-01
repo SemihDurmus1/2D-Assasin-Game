@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 3093328110489457828}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -1.4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -77,7 +77,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.12}
+  m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -88,7 +88,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.24, y: 0.03}
+  m_Size: {x: 0.16869187, y: 0.029447526}
   m_EdgeRadius: 0
 --- !u!1 &3835441585769221623
 GameObject:
@@ -104,7 +104,7 @@ GameObject:
   - component: {fileID: 2545937718466262288}
   - component: {fileID: 5758275450699387095}
   - component: {fileID: 107143730184575021}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -120,7 +120,7 @@ Transform:
   m_GameObject: {fileID: 3835441585769221623}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.97, y: -0.62, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -167,7 +167,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1935651921
-  m_SortingLayer: 1
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 317b8365a4649ab459f6cb58ec8f9f18, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -195,12 +195,16 @@ MonoBehaviour:
   speed: 7
   jumpForce: 18
   playerAttackPoint: {fileID: 5390481430777040205}
-  attackRange: 0.6
+  attackRange: 0.55
   attackDamage: 100
   attackRate: 2
   enemyLayers:
     serializedVersion: 2
     m_Bits: 64
+  waitAfterAttack: 0.48
+  stonePrefab: {fileID: 8326905656423286602, guid: e855fd8bb8512034aba29e9221629186, type: 3}
+  stoneXForce: 15
+  stoneYForce: 20
 --- !u!95 &2545937718466262288
 Animator:
   serializedVersion: 5
@@ -238,13 +242,13 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 6
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: acc8c04c15ca6ff4c8c8b0a974dc87af, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   m_Interpolate: 2
   m_SleepingMode: 0
   m_CollisionDetection: 0
@@ -264,7 +268,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -281,10 +285,10 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.0005106926, y: 1.3134582}
+  m_Offset: {x: 0, y: -0.2}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0}
+    pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 3, y: 3}
     newSize: {x: 4, y: 4}
     adaptiveTilingThreshold: 0.5
@@ -292,7 +296,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.99509716, y: 2.3337789}
+  m_Size: {x: 1, y: 2.33}
   m_EdgeRadius: 0
 --- !u!1 &8123607961474298735
 GameObject:
@@ -319,7 +323,7 @@ Transform:
   m_GameObject: {fileID: 8123607961474298735}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.08, y: 1.616, z: 0}
+  m_LocalPosition: {x: -1.08, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

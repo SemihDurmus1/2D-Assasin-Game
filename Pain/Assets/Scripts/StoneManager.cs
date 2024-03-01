@@ -2,15 +2,14 @@ using UnityEngine;
 
 public class ThrowStone : MonoBehaviour
 {
-    private GameObject stonePrefab;
 
     private void Start()
     {
-        stonePrefab = GameObject.FindGameObjectWithTag("stone");
+        Invoke(nameof(DestroyItSelf), 5f);
     }
 
-    public void ThrowObject(Vector2 throwAxis)
+    void DestroyItSelf()
     {
-        Instantiate(stonePrefab, transform.position, Quaternion.identity);
+        Destroy(gameObject);
     }
 }
