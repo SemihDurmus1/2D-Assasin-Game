@@ -36,7 +36,7 @@ public class PlayerMovement : MonoBehaviour
     private bool isDead = false;
 
     //CloakAnim
-    private bool isOnCloak = false;
+    public bool isOnCloak = false;
     Color playerColor;
     #endregion
 
@@ -114,11 +114,16 @@ public class PlayerMovement : MonoBehaviour
         }
         if (Input.GetKeyDown("f"))
         {
-            playerColor.a = isOnCloak ? 1f : 0.2f; //ternary if else yazimi
-            playerSprite.color = playerColor;
-
-            isOnCloak = !isOnCloak;
+            CloakEngage();
         }
+    }
+
+    private void CloakEngage()
+    {
+        playerColor.a = isOnCloak ? 1f : 0.2f; //ternary if else yazimi
+        playerSprite.color = playerColor;
+
+        isOnCloak = !isOnCloak;
     }
 
     private void ThrowStone()

@@ -24,6 +24,7 @@ public class EnemyManager : MonoBehaviour
 
     //Sigh of View
     public float radius = 10f;
+    public float awareRange = 1.5f;
     [Range(1, 360)] public float angle = 45f;
     public LayerMask targetLayer;
     public LayerMask obstructionLayer;
@@ -68,43 +69,55 @@ public class EnemyManager : MonoBehaviour
 
         if (!CanSeePlayer)
         {
-            animator.SetBool("isRunning", false);
-            animator.SetBool("isAttacking", false);
+            StopChasing();
         }
-
         if (rangeCheck.Length <= 0)//Gorus alaninda bir collider yoksa return et
         {
-            CanSeePlayer = false;
-            animator.SetBool("isRunning", false);
+            StopChasing();
             return;
         }
 
-        Transform target = rangeCheck[0].transform;//Layeri targetLayer olan ilk objenin transformunu al
-        Vector2 directionToTarget = (target.position - transform.position).normalized;//Aradaki acisal vektoru hesaplar
+        if (!CanSeePlayer && GameManager.Instance.IsPlayerHiding())
+        {
+            return;
+        }
+
+        Transform target = rangeCheck[0].transform;                                    //targetLayer olan ilk objenin transformu
+        Vector2 directionToTarget = (target.position - transform.position).normalized; //Aradaki acisal vektoru hesaplar
         float distanceToTarget = Vector2.Distance(transform.position, target.position);//iki pozisyon arasi uzakligi al
 
-        if (CanSeePlayer && !Physics2D.Raycast(transform.position, directionToTarget, distanceToTarget, obstructionLayer))
-        {//Eger bir kere gorus alani icine girmisse, aci disinda da olsak dusman range boyunca gorebilecek 
+        if (distanceToTarget <= awareRange)//Belli yakinliga girince arkasinda olsak bile calismasi icin
+        {
+            CanSeePlayer = true;
             return;
+        }
+        RaycastHit2D rayHit = Physics2D.Raycast(transform.position, directionToTarget, distanceToTarget, obstructionLayer);
+        if (CanSeePlayer && !rayHit )//arada engel layer yoksa
+        {
+            return; //Burada muhtemel bir bug yasanabilir, canseeplayer =true yaparak cozebiliriz belki
         }
         else
         {
-            CanSeePlayer = false;
-            animator.SetBool("isRunning", false);
+            StopChasing();
         }
         if (Vector2.Angle(transform.right, directionToTarget) > angle / 2)
         {//Aradaki vektor, gorus acisi vektorunden buyukse return et
-            CanSeePlayer = false;
-            animator.SetBool("isRunning", false);
+            StopChasing();
             return;
         }
         if (Physics2D.Raycast(transform.position, directionToTarget, distanceToTarget, obstructionLayer))
-        {//Atilan raycast bir engel layerina(obstructionLayer) takiliyor ise playeri goremez
-            CanSeePlayer = false;
-            animator.SetBool("isRunning", false);
+        {//Raycast engele takiliyor ise playeri goremez
+            StopChasing();
             return;
         }
         CanSeePlayer = true;//Eger tum sartlari basarili hallettiyse
+    }
+    private void StopChasing()
+    {
+        CanSeePlayer = false;
+        animator.SetBool("isRunning", false);
+        animator.SetBool("isAttacking", false);
+        rb.velocity = Vector2.zero;//Buraya rb yi zamanla azaltma eklenecek
     }
 
     private void OnDrawGizmos()
@@ -112,11 +125,15 @@ public class EnemyManager : MonoBehaviour
         if (attackPoint != null)//Draw Attackpoint
             Gizmos.DrawWireSphere(attackPoint.position, attackRange);
 
-        //Beyaz cember
-        Gizmos.color = Color.white;
+        //Gorus cemberi
+        Gizmos.color = Color.blue;
         UnityEditor.Handles.DrawWireDisc(transform.position, Vector3.forward, radius);
 
-        //Acilar
+        //aware cemberi
+        Gizmos.color = Color.red;
+        UnityEditor.Handles.DrawWireDisc(transform.position, Vector3.forward, awareRange);
+
+        //Gorus alani cizgileri
         Vector3 angleFirst = DirectionFromAngle(transform.eulerAngles.y, -angle / 2);
         Vector3 angleSecond = DirectionFromAngle(transform.eulerAngles.y, angle / 2);
 
@@ -139,25 +156,22 @@ public class EnemyManager : MonoBehaviour
 
     private void ChasePlayer()
     {
-        float distanceToPlayer = Mathf.Abs(attackPoint.position.x - GameManager.Instance.playerTransform.position.x);
+        float distanceToPlayerX = Mathf.Abs(attackPoint.position.x - GameManager.Instance.playerTransform.position.x);
+        float distanceToPlayerY = Mathf.Abs(attackPoint.position.y - GameManager.Instance.playerTransform.position.y);
 
-        if (distanceToPlayer <= 2f) // player attackRange içindeyse
+        if (distanceToPlayerX <= 2f && distanceToPlayerY <= 3f) // player attackRange içindeyse
         {
             StartAttack();
         }
-        else if (attackPoint.position.x + 1f < GameManager.Instance.playerTransform.position.x)//player sagda ise
+        else if (GameManager.Instance.playerTransform.position.x > attackPoint.position.x)//player saðda ise
         {
             //Saga kos
-            rb.velocity = new Vector2(moveSpeed, rb.velocity.y);
-            animator.SetBool("isAttacking", false);
-            animator.SetBool("isRunning",true);
+            StartRunning(moveSpeed);
         }
-        else if(attackPoint.position.x -1f > GameManager.Instance.playerTransform.position.x)//player solda ise
+        else if (GameManager.Instance.playerTransform.position.x < attackPoint.position.x)//player solda ise
         {
             //Sola kos
-            rb.velocity = new Vector2(-moveSpeed, rb.velocity.y);
-            animator.SetBool("isAttacking", false);
-            animator.SetBool("isRunning", true);
+            StartRunning(-moveSpeed);
         }
         else
         {
@@ -165,6 +179,15 @@ public class EnemyManager : MonoBehaviour
             animator.SetBool("isAttacking", false);
         }
     }
+
+
+    private void StartRunning(float moveSpeed)
+    {
+        rb.velocity = new Vector2(moveSpeed, rb.velocity.y);
+        animator.SetBool("isAttacking", false);
+        animator.SetBool("isRunning", true);
+    }
+
     private void StartAttack()
     {
         if (Time.time >= nextAttackTime)
@@ -176,11 +199,6 @@ public class EnemyManager : MonoBehaviour
 
     }
 
-    //private IEnumerator KillAfterAnimation()
-    //{
-    //    // Animasyonun uzunluguna gore bekle
-    //    yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
-    //}
     public void EventAttack()//Animation Event
     {
         Collider2D hitPlayer = Physics2D.OverlapCircle(attackPoint.position, attackRange, targetLayer);
@@ -223,11 +241,11 @@ public class EnemyManager : MonoBehaviour
 
     private void CheckMovementDirection()//Sprite flipini halleder
     {
-        if (rb.velocity.x > 0.1f)
+        if (rb.velocity.x > 0.2f)
         {
             transform.rotation = Quaternion.Euler(0f, 0, 0f);
         }
-        else if (rb.velocity.x < - 0.9f)
+        else if (rb.velocity.x < - 0.8f)
         {
             transform.rotation = Quaternion.Euler(0f, 180f, 0f);
         }

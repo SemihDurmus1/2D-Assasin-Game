@@ -59,3 +59,6 @@ TagManager:
   - name: Enemy
     uniqueID: 3631537375
     locked: 0
+  - name: HideObjects
+    uniqueID: 1259808419
+    locked: 0

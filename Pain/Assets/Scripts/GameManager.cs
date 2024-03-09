@@ -34,4 +34,9 @@ public class GameManager : MonoBehaviour
     {
         playerScript.GetDamage(damageAmount);
     }
+
+    public bool IsPlayerHiding()
+    {
+        return playerScript.isOnCloak;
+    }
 }
