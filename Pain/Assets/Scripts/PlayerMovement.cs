@@ -10,7 +10,15 @@ public class PlayerMovement : MonoBehaviour
     #region Movement
     //Movement
     [SerializeField] float speed = 7f;
+
     [SerializeField] float jumpForce = 18f;
+
+    [SerializeField] private float coyoteTime = 0.2f;
+    private float coyoteTimeCounter;
+
+    [SerializeField] float jumpBufferTime = 0.2f;
+    private float jumpBufferCounter;
+
     private float inputX;
     private Rigidbody2D rb;
     //Ground check
@@ -28,14 +36,16 @@ public class PlayerMovement : MonoBehaviour
     private float nextAttackTime = 0f;
     private bool isAttacking = false;
     public LayerMask enemyLayers;
-    [SerializeField]private float waitAfterAttack = 0.48f;
+    public LayerMask cloakLayers;
+    [SerializeField] private float waitAfterAttack = 0.48f;
 
     //Anim States
     private SpriteRenderer playerSprite;
-    private bool combatIdle = false;
+    //private bool combatIdle = false;
     private bool isDead = false;
 
     //CloakAnim
+    Collider2D[] cloakPlaces;
     public bool isOnCloak = false;
     Color playerColor;
     #endregion
@@ -56,19 +66,21 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         m_groundSensor = transform.Find("GroundSensor").GetComponent<Sensor_Bandit>();
     }
-	
-	void Update()
+
+    void Update()
     {
         GroundControl();
 
-        if (isDead) {  return; }
+        if (isDead) { return; }
 
         CheckInput();
+        HandleCloak();
 
         CheckMovementDirection();
 
         ControlAnimates();
     }
+
     private void FixedUpdate()
     {
         if (!isAttacking)
@@ -84,7 +96,7 @@ public class PlayerMovement : MonoBehaviour
         2 = Run */
 
         animator.SetFloat("AirSpeed", rb.velocity.y);//AirSpeed 0 dan kucukse calisir
-        
+
         if (Mathf.Abs(inputX) > Mathf.Epsilon)//Run
             animator.SetInteger("AnimState", 2);
 
@@ -104,10 +116,9 @@ public class PlayerMovement : MonoBehaviour
         {
             StartAttack();
         }
-        if (Input.GetButtonDown("Jump") && isGrounded)//Ziplama
-        {
-            StartJump();
-        }
+
+        CheckForJump();
+
         if (Input.GetKeyDown(KeyCode.Q))//Throw object
         {
             ThrowStone();
@@ -120,10 +131,40 @@ public class PlayerMovement : MonoBehaviour
 
     private void CloakEngage()
     {
+        cloakPlaces = Physics2D.OverlapCircleAll(transform.position, transform.position.x, cloakLayers);
+
+        if (cloakPlaces.Length > 0)
+        {
+            SwitchCloak();
+        }
+    }
+    private void SwitchCloak()
+    {
         playerColor.a = isOnCloak ? 1f : 0.2f; //ternary if else yazimi
         playerSprite.color = playerColor;
 
         isOnCloak = !isOnCloak;
+    }
+    private void EndCloak()
+    {
+        if (isOnCloak)
+        {
+            playerColor.a = 1f;
+            playerSprite.color = playerColor;
+
+            isOnCloak = false;
+        }
+    }
+    private void HandleCloak()
+    {
+        if (isOnCloak)
+        {
+            cloakPlaces = Physics2D.OverlapCircleAll(transform.position, transform.position.x, cloakLayers);
+            if (cloakPlaces.Length < 1)
+            {
+                SwitchCloak();
+            }
+        }
     }
 
     private void ThrowStone()
@@ -142,6 +183,38 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+
+    private void CheckForJump()
+    {
+        if (isGrounded)
+        {
+            coyoteTimeCounter = coyoteTime;
+        }
+        else
+        {
+            coyoteTimeCounter -= Time.deltaTime;
+        }
+
+        if (Input.GetButtonDown("Jump"))
+        {
+            jumpBufferCounter = jumpBufferTime;
+        }
+        else
+        {
+            jumpBufferCounter -= Time.deltaTime;
+        }
+
+        if (jumpBufferCounter > 0f && coyoteTimeCounter >= 0f)//Ziplama
+        {
+            StartJump();
+        }
+        if (Input.GetButtonUp("Jump") && rb.velocity.y > 0f)//Ziplama
+        {
+            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
+
+            coyoteTimeCounter = 0f;
+        }
+    }
     private void StartJump()
     {
         animator.SetTrigger("Jump");
@@ -153,7 +226,10 @@ public class PlayerMovement : MonoBehaviour
 
         rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         m_groundSensor.Disable(0.2f);
+
+        jumpBufferCounter = 0f;
     }
+
 
     private void StartAttack()
     {
@@ -179,7 +255,8 @@ public class PlayerMovement : MonoBehaviour
             //Her enemyye damage at
             enemy.GetComponent<EnemyManager>().TakeDamage(attackDamage);
         }
-        Invoke(nameof(StopAttacking), waitAfterAttack);//Yerine sabitlemeyi kaldiri
+        Invoke(nameof(StopAttacking), waitAfterAttack);//Yerine sabitlemeyi kaldirir
+        EndCloak();
     }
 
     private void GroundControl()
@@ -258,7 +335,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
     }
-    private void OnDrawGizmosSelected()
+    private void OnDrawGizmos()
     {
         if (playerAttackPoint == null) { return; }
 

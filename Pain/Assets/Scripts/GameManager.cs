@@ -1,5 +1,6 @@
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -28,6 +29,11 @@ public class GameManager : MonoBehaviour
     private void Update()
     {
         playerTransform.position = playerObject.transform.position;
+
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            SceneManager.LoadScene(0);
+        }
     }
 
     public void AttackToPlayer(int damageAmount)

@@ -41,8 +41,8 @@ GameObject:
   m_Component:
   - component: {fileID: 625621443563648739}
   - component: {fileID: 3651720238655559994}
-  - component: {fileID: 7044580221827080150}
   - component: {fileID: 1111392919442956198}
+  - component: {fileID: 7044580221827080150}
   - component: {fileID: 3707234988636608323}
   - component: {fileID: 8663504686437266962}
   m_Layer: 6
@@ -107,7 +107,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -663429921
-  m_SortingLayer: 5
+  m_SortingLayer: 7
   m_SortingOrder: 0
   m_Sprite: {fileID: 4723107735738678597, guid: f374107ba66790641b6b7c9d0d9a49d3, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -120,6 +120,37 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1111392919442956198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5908846685407525801}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f838ede190e98b94bb0a821b0b712993, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 100
+  moveSpeed: 6
+  attackPoint: {fileID: 1120512211594257375}
+  attackRange: 2.5
+  attackDmg: 0
+  attackRate: 2
+  radius: 10
+  awareRange: 1.5
+  angle: 120
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  obstructionLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  stoneLayer:
+    serializedVersion: 2
+    m_Bits: 512
+  playerRef: {fileID: 0}
 --- !u!61 &7044580221827080150
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -165,34 +196,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.292306, y: 2.634964}
   m_EdgeRadius: 0
---- !u!114 &1111392919442956198
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5908846685407525801}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f838ede190e98b94bb0a821b0b712993, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  health: 100
-  moveSpeed: 6
-  attackPoint: {fileID: 1120512211594257375}
-  attackRange: 2.5
-  attackDmg: 20
-  attackRate: 2
-  radius: 10
-  awareRange: 1.5
-  angle: 90
-  targetLayer:
-    serializedVersion: 2
-    m_Bits: 128
-  obstructionLayer:
-    serializedVersion: 2
-    m_Bits: 256
-  playerRef: {fileID: 0}
 --- !u!95 &3707234988636608323
 Animator:
   serializedVersion: 5

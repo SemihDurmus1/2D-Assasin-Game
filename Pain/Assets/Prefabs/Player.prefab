@@ -193,7 +193,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 7
-  jumpForce: 18
+  jumpForce: 22
+  coyoteTime: 0.2
+  jumpBufferTime: 0.2
   playerAttackPoint: {fileID: 5390481430777040205}
   attackRange: 0.55
   attackDamage: 100
@@ -201,7 +203,11 @@ MonoBehaviour:
   enemyLayers:
     serializedVersion: 2
     m_Bits: 64
+  cloakLayers:
+    serializedVersion: 2
+    m_Bits: 1024
   waitAfterAttack: 0.48
+  isOnCloak: 0
   stonePrefab: {fileID: 8326905656423286602, guid: e855fd8bb8512034aba29e9221629186, type: 3}
   stoneXForce: 15
   stoneYForce: 20
@@ -268,7 +274,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 0
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2

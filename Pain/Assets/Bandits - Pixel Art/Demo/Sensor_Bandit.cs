@@ -7,9 +7,18 @@ public class Sensor_Bandit : MonoBehaviour {
 
     private float m_DisableTimer;
 
+    private BoxCollider2D m_Collider;
+    private Transform colliderTransform;
+
     private void OnEnable()
     {
         m_ColCount = 0;
+    }
+
+    private void Start()
+    {
+        m_Collider = GetComponent<BoxCollider2D>();
+        colliderTransform = m_Collider.transform;
     }
 
     public bool State()
@@ -32,6 +41,7 @@ public class Sensor_Bandit : MonoBehaviour {
     void Update()
     {
         m_DisableTimer -= Time.deltaTime;
+        m_Collider.transform.position = colliderTransform.position;
     }
 
     public void Disable(float duration)

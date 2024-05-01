@@ -12,6 +12,7 @@ public class EnemyManager : MonoBehaviour
 
     [SerializeField] private int health = 100;
     public float moveSpeed = 6f;
+    public float walkSpeed = 3f;
 
     private bool isDead = false;
 
@@ -26,12 +27,23 @@ public class EnemyManager : MonoBehaviour
     public float radius = 10f;
     public float awareRange = 1.5f;
     [Range(1, 360)] public float angle = 45f;
+
+    //LayerMasks
     public LayerMask targetLayer;
     public LayerMask obstructionLayer;
+    public LayerMask stoneLayer;
+
+    //Obje duyma mekanigi
+    private bool isHeardSomething = false;
 
     public GameObject playerRef;
 
-    public bool CanSeePlayer {  get; private set; }
+    public bool CanSeePlayer { get; private set; }
+
+    //Patrol ------------ Burasý gelistirilecek
+    public Transform patrolPoint1, patrolPoint2;
+    private int currentPatrolIndex = 0;
+    private bool isMovingFirst = true;
     #endregion
 
     void Start()
@@ -41,7 +53,9 @@ public class EnemyManager : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
 
         playerRef = GameObject.FindGameObjectWithTag("Player");
+
         StartCoroutine(FOVCheck());
+
         attackPoint = transform.Find(nameof(attackPoint));
     }
 
@@ -51,8 +65,12 @@ public class EnemyManager : MonoBehaviour
         CheckMovementDirection();
 
         if (CanSeePlayer && !isDead) { ChasePlayer(); }
+        //else Patrol();
     }
-
+    void Patrol()
+    {
+        
+    }
     private IEnumerator FOVCheck()
     {
         WaitForSeconds wait = new WaitForSeconds(0.2f);
@@ -63,10 +81,33 @@ public class EnemyManager : MonoBehaviour
             FOV();
         }
     }
-    private void FOV()//Kodun sýra iþleyiþi sýkýntýlý, bir kere gördü mü, arada engel layer olsa da görüyor
+    private void FOV()
     {
-        Collider2D[] rangeCheck = Physics2D.OverlapCircleAll(transform.position, radius, targetLayer);
+        if (isDead) { return; }
 
+
+        Collider2D[] stoneCheck = Physics2D.OverlapCircleAll(transform.position, radius, stoneLayer);
+
+        if (stoneCheck.Length > 0) 
+        {
+            Transform targetStone = stoneCheck[0].transform;
+            Vector2 directionToStone = (targetStone.position - transform.position).normalized; //Aradaki acisal vektoru hesaplar
+            float distanceToStone = Vector2.Distance(transform.position, targetStone.position);//iki pozisyon arasi uzakligi al
+
+
+            if (!CanSeePlayer && isHeardSomething)
+            {
+                RunToPoint(targetStone.position);
+            }
+        }
+
+
+        Collider2D[] rangeCheck = Physics2D.OverlapCircleAll(transform.position, radius, targetLayer);
+        WhenSeePLayer(rangeCheck);
+    }
+
+    private void WhenSeePLayer(Collider2D[] rangeCheck)
+    {
         if (!CanSeePlayer)
         {
             StopChasing();
@@ -76,7 +117,6 @@ public class EnemyManager : MonoBehaviour
             StopChasing();
             return;
         }
-
         if (!CanSeePlayer && GameManager.Instance.IsPlayerHiding())
         {
             return;
@@ -92,9 +132,10 @@ public class EnemyManager : MonoBehaviour
             return;
         }
         RaycastHit2D rayHit = Physics2D.Raycast(transform.position, directionToTarget, distanceToTarget, obstructionLayer);
-        if (CanSeePlayer && !rayHit )//arada engel layer yoksa
+        if (CanSeePlayer && !rayHit)//arada engel layer yoksa
         {
-            return; //Burada muhtemel bir bug yasanabilir, canseeplayer =true yaparak cozebiliriz belki
+            CanSeePlayer = true;
+            return; //Burada muhtemel bir bug yasanabilir, canseeplayer =true yaparak cozebiliriz belki -- cozuldu
         }
         else
         {
@@ -112,6 +153,33 @@ public class EnemyManager : MonoBehaviour
         }
         CanSeePlayer = true;//Eger tum sartlari basarili hallettiyse
     }
+
+    //Run and Chase-----------------------------------------------------------------------------
+    private void ChasePlayer()
+    {
+        float distanceToPlayerX = Mathf.Abs(attackPoint.position.x - GameManager.Instance.playerTransform.position.x);
+        float distanceToPlayerY = Mathf.Abs(attackPoint.position.y - GameManager.Instance.playerTransform.position.y);
+
+        if (distanceToPlayerX <= 2f && distanceToPlayerY <= 3f) // player attackRange içindeyse
+        {
+            StartAttack();
+        }
+        else if (GameManager.Instance.playerTransform.position.x > attackPoint.position.x)//player saðda ise
+        {
+            //Saga kos
+            StartRunning(moveSpeed);
+        }
+        else if (GameManager.Instance.playerTransform.position.x < attackPoint.position.x)//player solda ise
+        {
+            //Sola kos
+            StartRunning(-moveSpeed);
+        }
+        else
+        {
+            animator.SetBool("isRunning", false);
+            animator.SetBool("isAttacking", false);
+        }
+    }
     private void StopChasing()
     {
         CanSeePlayer = false;
@@ -119,7 +187,38 @@ public class EnemyManager : MonoBehaviour
         animator.SetBool("isAttacking", false);
         rb.velocity = Vector2.zero;//Buraya rb yi zamanla azaltma eklenecek
     }
+    private void RunToPoint(Vector2 RunPoint)
+    {
+        float RunPointX = Mathf.Abs(attackPoint.position.x - RunPoint.x);
+        float RunPointY = Mathf.Abs(attackPoint.position.y - RunPoint.y);
 
+        if (RunPointX <= 2f && RunPointY <= 3f) // player attackRange içindeyse
+        {
+            
+        }
+        else if (RunPoint.x > attackPoint.position.x)//player saðda ise
+        {
+            //Saga kos
+            StartRunning(moveSpeed);
+        }
+        else if (RunPoint.x < attackPoint.position.x)//player solda ise
+        {
+            //Sola kos
+            StartRunning(-moveSpeed);
+        }
+        else
+        {
+            animator.SetBool("isRunning", false);
+            animator.SetBool("isAttacking", false);
+        }
+    }
+    private void StartRunning(float moveSpeed)
+    {
+        rb.velocity = new Vector2(moveSpeed, rb.velocity.y);
+        animator.SetBool("isAttacking", false);
+        animator.SetBool("isRunning", true);
+    }
+    //--------------------------------------------------------------------------------
     private void OnDrawGizmos()
     {
         if (attackPoint != null)//Draw Attackpoint
@@ -154,40 +253,6 @@ public class EnemyManager : MonoBehaviour
         return new Vector2(Mathf.Cos(angleInDegrees * Mathf.Deg2Rad), Mathf.Sin(angleInDegrees * Mathf.Deg2Rad));
     }
 
-    private void ChasePlayer()
-    {
-        float distanceToPlayerX = Mathf.Abs(attackPoint.position.x - GameManager.Instance.playerTransform.position.x);
-        float distanceToPlayerY = Mathf.Abs(attackPoint.position.y - GameManager.Instance.playerTransform.position.y);
-
-        if (distanceToPlayerX <= 2f && distanceToPlayerY <= 3f) // player attackRange içindeyse
-        {
-            StartAttack();
-        }
-        else if (GameManager.Instance.playerTransform.position.x > attackPoint.position.x)//player saðda ise
-        {
-            //Saga kos
-            StartRunning(moveSpeed);
-        }
-        else if (GameManager.Instance.playerTransform.position.x < attackPoint.position.x)//player solda ise
-        {
-            //Sola kos
-            StartRunning(-moveSpeed);
-        }
-        else
-        {
-            animator.SetBool("isRunning", false);
-            animator.SetBool("isAttacking", false);
-        }
-    }
-
-
-    private void StartRunning(float moveSpeed)
-    {
-        rb.velocity = new Vector2(moveSpeed, rb.velocity.y);
-        animator.SetBool("isAttacking", false);
-        animator.SetBool("isRunning", true);
-    }
-
     private void StartAttack()
     {
         if (Time.time >= nextAttackTime)
@@ -198,7 +263,6 @@ public class EnemyManager : MonoBehaviour
         }
 
     }
-
     public void EventAttack()//Animation Event
     {
         Collider2D hitPlayer = Physics2D.OverlapCircle(attackPoint.position, attackRange, targetLayer);
@@ -230,7 +294,8 @@ public class EnemyManager : MonoBehaviour
 
         enemyCollider.isTrigger = true;
         rb.bodyType = RigidbodyType2D.Static;
-
+        this.enabled = false;
+        enemyCollider.enabled = false;
         isDead = true;
     }
 
