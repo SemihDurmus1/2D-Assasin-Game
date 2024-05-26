@@ -432,6 +432,7 @@
 "Assets/Cainos/Third Party/Lucid Editor/Runtime/Attributes/ValidateInputAttribute.cs"
 "Assets/Cainos/Third Party/Lucid Editor/Runtime/Enum.cs"
 "Assets/Cainos/Third Party/Lucid Editor/Runtime/PropertyGroupAttribute.cs"
+"Assets/Scripts/EndOfLevel.cs"
 "Assets/Scripts/Enemy/EnemyManager.cs"
 "Assets/Scripts/GameManager.cs"
 "Assets/Scripts/PlayerMovement.cs"

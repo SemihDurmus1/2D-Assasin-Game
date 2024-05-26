@@ -335,10 +335,10 @@ public class PlayerMovement : MonoBehaviour
         }
 
     }
-    private void OnDrawGizmos()
-    {
-        if (playerAttackPoint == null) { return; }
+    //private void OnDrawGizmos()
+    //{
+    //    if (playerAttackPoint == null) { return; }
 
-        Gizmos.DrawWireSphere(playerAttackPoint.position, attackRange);
-    }
+    //    Gizmos.DrawWireSphere(playerAttackPoint.position, attackRange);
+    //}
 }

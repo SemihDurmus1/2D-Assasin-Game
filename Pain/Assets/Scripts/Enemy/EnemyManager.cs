@@ -32,6 +32,7 @@ public class EnemyManager : MonoBehaviour
     public LayerMask targetLayer;
     public LayerMask obstructionLayer;
     public LayerMask stoneLayer;
+    public LayerMask enemyLayer;
 
     //Obje duyma mekanigi
     private bool isHeardSomething = false;
@@ -65,10 +66,6 @@ public class EnemyManager : MonoBehaviour
         CheckMovementDirection();
 
         if (CanSeePlayer && !isDead) { ChasePlayer(); }
-        //else Patrol();
-    }
-    void Patrol()
-    {
         
     }
     private IEnumerator FOVCheck()
@@ -212,40 +209,60 @@ public class EnemyManager : MonoBehaviour
             animator.SetBool("isAttacking", false);
         }
     }
+    private void NotifyOtherEnemies()
+    {
+        // Bu düþmanýn görüþ alanýndaki diðer düþmanlarý bul
+        Collider2D[] otherEnemies = Physics2D.OverlapCircleAll(transform.position, radius, enemyLayer);
+        foreach (Collider2D otherEnemyCollider in otherEnemies)
+        {
+            //// Kendi colliderýný kontrol etme
+            //if (otherEnemyCollider.gameObject == gameObject)
+            //{
+            //    continue;
+            //}
+            // Diðer düþmanlarý haberdar et
+            EnemyManager otherEnemyManager = otherEnemyCollider.GetComponent<EnemyManager>();
+            if (otherEnemyManager != null)
+            {
+                otherEnemyManager.CanSeePlayer = true;
+            }
+        }
+    }
     private void StartRunning(float moveSpeed)
     {
+        NotifyOtherEnemies();
         rb.velocity = new Vector2(moveSpeed, rb.velocity.y);
         animator.SetBool("isAttacking", false);
         animator.SetBool("isRunning", true);
     }
     //--------------------------------------------------------------------------------
-    private void OnDrawGizmos()
-    {
-        if (attackPoint != null)//Draw Attackpoint
-            Gizmos.DrawWireSphere(attackPoint.position, attackRange);
+    //private void OnDrawGizmos()
+    //{
+    //    if (attackPoint != null)//Draw Attackpoint
+    //        Gizmos.DrawWireSphere(attackPoint.position, attackRange);
 
-        //Gorus cemberi
-        Gizmos.color = Color.blue;
-        UnityEditor.Handles.DrawWireDisc(transform.position, Vector3.forward, radius);
+    //    //Gorus cemberi
+    //    Gizmos.color = Color.blue;
+    //    UnityEditor.Handles.DrawWireDisc(transform.position, Vector3.forward, radius);
 
-        //aware cemberi
-        Gizmos.color = Color.red;
-        UnityEditor.Handles.DrawWireDisc(transform.position, Vector3.forward, awareRange);
+    //    //aware cemberi
+    //    Gizmos.color = Color.red;
+    //    UnityEditor.Handles.DrawWireDisc(transform.position, Vector3.forward, awareRange);
 
-        //Gorus alani cizgileri
-        Vector3 angleFirst = DirectionFromAngle(transform.eulerAngles.y, -angle / 2);
-        Vector3 angleSecond = DirectionFromAngle(transform.eulerAngles.y, angle / 2);
+    //    //Gorus alani cizgileri
+    //    Vector3 angleFirst = DirectionFromAngle(transform.eulerAngles.y, -angle / 2);
+    //    Vector3 angleSecond = DirectionFromAngle(transform.eulerAngles.y, angle / 2);
 
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(transform.position, transform.position + angleFirst * radius);
-        Gizmos.DrawLine(transform.position, transform.position + angleSecond * radius);
+    //    Gizmos.color = Color.yellow;
+    //    Gizmos.DrawLine(transform.position, transform.position + angleFirst * radius);
+    //    Gizmos.DrawLine(transform.position, transform.position + angleSecond * radius);
 
-        if (CanSeePlayer)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(transform.position, playerRef.transform.position);
-        }
-    }
+    //    if (CanSeePlayer)
+    //    {
+    //        Gizmos.color = Color.red;
+    //        Gizmos.DrawLine(transform.position, playerRef.transform.position);
+    //    }
+    //}
     private Vector2 DirectionFromAngle(float eulerY, float angleInDegrees)
     {
         angleInDegrees += eulerY;
